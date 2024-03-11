@@ -23,7 +23,7 @@ public class FilmController {
         return ++filmId;
     }
 
-    private final static LocalDate minDateOfFilm = LocalDate.of(1895, Month.DECEMBER, 28);
+    private final LocalDate minDateOfFilm = LocalDate.of(1895, Month.DECEMBER, 28);
 
     @GetMapping()
     public List<Film> findAll() throws ValidationException {
