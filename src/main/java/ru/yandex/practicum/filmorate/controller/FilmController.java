@@ -22,6 +22,7 @@ public class FilmController {
     public int generateFilmId() {
         return ++filmId;
     }
+
     private final static LocalDate minDateOfFilm = LocalDate.of(1895, Month.DECEMBER, 28);
 
     @GetMapping()
@@ -31,7 +32,7 @@ public class FilmController {
 
     @PostMapping()
     public Film create(@Valid @RequestBody Film film) throws ValidationException {
-        if(film.getReleaseDate().isBefore(minDateOfFilm)){
+        if (film.getReleaseDate().isBefore(minDateOfFilm)) {
             log.error("Дата '{}' не может быть раньше '{}'", film.getReleaseDate(), minDateOfFilm);
             throw new ValidationException("Ошибка валидации");
         }
@@ -40,9 +41,10 @@ public class FilmController {
         log.info("Фильм '{}' успешно добавлен", film.getName());
         return film;
     }
+
     @PutMapping()
     public Film update(@Valid @RequestBody Film film) throws ValidationException {
-        if(film.getReleaseDate().isBefore(minDateOfFilm)){
+        if (film.getReleaseDate().isBefore(minDateOfFilm)) {
             log.error("Дата '{}' не может быть раньше '{}'", film.getReleaseDate(), minDateOfFilm);
             throw new ValidationException("Ошибка валидации");
         }

@@ -1,15 +1,14 @@
 package ru.yandex.practicum.filmorate.controller;
 
 import lombok.extern.slf4j.Slf4j;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
 
 import javax.validation.Valid;
 import java.time.LocalDate;
-import java.time.Month;
+
 import java.util.*;
 
 @RestController
@@ -28,15 +27,16 @@ public class UserController {
     public List<User> getUsers() throws ValidationException {
         return new ArrayList<>(users.values());
     }
+
     @PostMapping()
     public User create(@Valid @RequestBody User user) throws ValidationException {
-        if(user.getBirthday().isAfter(LocalDate.now())){
+        if (user.getBirthday().isAfter(LocalDate.now())) {
             log.error("Дата рождения пользователя не может быть в будущем");
             throw new ValidationException("Ошибка валидации");
         }
-       if(user.getName() == null || user.getName().isBlank()){
-           user.setName(user.getLogin());
-       }
+        if (user.getName() == null || user.getName().isBlank()) {
+            user.setName(user.getLogin());
+        }
         user.setId(generateUserId());
         users.put(user.getId(), user);
         log.info("Пользователь создан");
@@ -45,11 +45,11 @@ public class UserController {
 
     @PutMapping()
     public User update(@Valid @RequestBody User user) throws ValidationException {
-        if(user.getBirthday().isAfter(LocalDate.now())){
+        if (user.getBirthday().isAfter(LocalDate.now())) {
             log.error("Дата рождения пользователя не может быть в будущем");
             throw new ValidationException("Ошибка валидации");
         }
-        if(user.getName() == null || user.getName().isBlank()){
+        if (user.getName() == null || user.getName().isBlank()) {
             user.setName(user.getLogin());
         }
         if (!users.containsKey(user.getId())) {
