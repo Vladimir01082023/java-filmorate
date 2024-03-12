@@ -7,7 +7,6 @@ import ru.yandex.practicum.filmorate.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
 
 import javax.validation.Valid;
-import java.time.LocalDate;
 
 import java.util.*;
 
@@ -16,7 +15,7 @@ import java.util.*;
 @Slf4j
 public class UserController {
 
-    private Map<Integer, User> users = new HashMap<>();
+    private final Map<Integer, User> users = new HashMap<>();
     private int usersId = 0;
 
     public int generateUserId() {
@@ -30,10 +29,6 @@ public class UserController {
 
     @PostMapping()
     public User create(@Valid @RequestBody User user) throws ValidationException {
-        if (user.getBirthday().isAfter(LocalDate.now())) {
-            log.error("Дата рождения пользователя не может быть в будущем");
-            throw new ValidationException("Ошибка валидации");
-        }
         if (user.getName() == null || user.getName().isBlank()) {
             user.setName(user.getLogin());
         }
@@ -45,10 +40,6 @@ public class UserController {
 
     @PutMapping()
     public User update(@Valid @RequestBody User user) throws ValidationException {
-        if (user.getBirthday().isAfter(LocalDate.now())) {
-            log.error("Дата рождения пользователя не может быть в будущем");
-            throw new ValidationException("Ошибка валидации");
-        }
         if (user.getName() == null || user.getName().isBlank()) {
             user.setName(user.getLogin());
         }

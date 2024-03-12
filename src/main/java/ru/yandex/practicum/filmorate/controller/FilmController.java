@@ -16,14 +16,14 @@ import java.util.*;
 @RequestMapping("/films")
 @Slf4j
 public class FilmController {
-    private Map<Integer, Film> films = new HashMap<>();
+    private final Map<Integer, Film> films = new HashMap<>();
     private int filmId = 0;
 
     public int generateFilmId() {
         return ++filmId;
     }
 
-    private final LocalDate minDateOfFilm = LocalDate.of(1895, Month.DECEMBER, 28);
+    private final static LocalDate MIN_DATE_OF_FILM = LocalDate.of(1895, Month.DECEMBER, 28);
 
     @GetMapping()
     public List<Film> findAll() throws ValidationException {
@@ -32,8 +32,8 @@ public class FilmController {
 
     @PostMapping()
     public Film create(@Valid @RequestBody Film film) throws ValidationException {
-        if (film.getReleaseDate().isBefore(minDateOfFilm)) {
-            log.error("Дата '{}' не может быть раньше '{}'", film.getReleaseDate(), minDateOfFilm);
+        if (film.getReleaseDate().isBefore(MIN_DATE_OF_FILM)) {
+            log.error("Дата '{}' не может быть раньше '{}'", film.getReleaseDate(), MIN_DATE_OF_FILM);
             throw new ValidationException("Ошибка валидации");
         }
         film.setId(generateFilmId());
@@ -44,8 +44,8 @@ public class FilmController {
 
     @PutMapping()
     public Film update(@Valid @RequestBody Film film) throws ValidationException {
-        if (film.getReleaseDate().isBefore(minDateOfFilm)) {
-            log.error("Дата '{}' не может быть раньше '{}'", film.getReleaseDate(), minDateOfFilm);
+        if (film.getReleaseDate().isBefore(MIN_DATE_OF_FILM)) {
+            log.error("Дата '{}' не может быть раньше '{}'", film.getReleaseDate(), MIN_DATE_OF_FILM);
             throw new ValidationException("Ошибка валидации");
         }
         if (!films.containsKey(film.getId())) {

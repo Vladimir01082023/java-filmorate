@@ -12,12 +12,13 @@ import java.time.LocalDate;
 @Setter
 @Builder
 public class Film {
-    private int id;
+    private Integer id;
     @NotBlank
     private final String name;
     @Size(max = 200)
     private final String description;
+    @NonNull
     private LocalDate releaseDate;
     @Min(1)
-    private final int duration;
+    private final Integer duration;
 }
