@@ -8,7 +8,10 @@ import java.util.List;
 @Repository
 public interface FilmStorage {
     List<Film> findAll();
+
     Film create(Film film);
+
     void remove(int id);
+
     Film update(Film film);
 }
