@@ -13,7 +13,7 @@ public class InMemoryUserStorage implements UserStorage {
     private final Map<Integer, User> users = new HashMap<>();
     private int usersId = 0;
 
-    public int generateUserId() {
+    private int generateUserId() {
         return ++usersId;
     }
 

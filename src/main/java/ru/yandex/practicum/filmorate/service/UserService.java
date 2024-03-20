@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.InMemoryUserStorage;
 
+import javax.validation.ValidationException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -40,18 +41,23 @@ public class UserService {
 
 
     public void addFriend(int userId, int friendId) {
-        log.info(String.format("Получен запрос на добавление в друзья. Пользователь с id = %s хочет добавить " +
-                "пользователя с id = %s", userId, friendId));
+        if (userId == friendId) {
+            log.warn("Id пользователя и id друга не должны совпадать");
+            throw new ValidationException();
+        } else {
+            log.info(String.format("Получен запрос на добавление в друзья. Пользователь с id = %s хочет добавить " +
+                    "пользователя с id = %s", userId, friendId));
 
-        User user = inMemoryUserStorage.getUserById(userId);
-        User friend = inMemoryUserStorage.getUserById(friendId);
-        Set<Integer> userFriends = user.getFriends();
-        Set<Integer> friendsOfAFriend = friend.getFriends();
+            User user = inMemoryUserStorage.getUserById(userId);
+            User friend = inMemoryUserStorage.getUserById(friendId);
+            Set<Integer> userFriends = user.getFriends();
+            Set<Integer> friendsOfAFriend = friend.getFriends();
 
-        userFriends.add(friendId);
-        friendsOfAFriend.add(userId);
+            userFriends.add(friendId);
+            friendsOfAFriend.add(userId);
 
-        log.info(String.format("Пользователи %s и %s стали друзьями", user.getName(), friend.getName()));
+            log.info(String.format("Пользователи %s и %s стали друзьями", user.getName(), friend.getName()));
+        }
     }
 
     public void removeFriend(int userId, int friendId) {
