@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.service.UserService;
 
 import javax.validation.Valid;
 
@@ -14,42 +15,50 @@ import java.util.*;
 @RequestMapping("/users")
 @Slf4j
 public class UserController {
+    private final UserService userService;
 
-    private final Map<Integer, User> users = new HashMap<>();
-    private int usersId = 0;
-
-    public int generateUserId() {
-        return ++usersId;
+    public UserController(UserService userService) {
+        this.userService = userService;
     }
+
 
     @GetMapping()
     public List<User> getUsers() throws ValidationException {
-        return new ArrayList<>(users.values());
+        return new ArrayList<>(userService.getUsers());
+    }
+
+    @GetMapping("/{userId}")
+    public User getUser(@PathVariable int usersId) {
+        return userService.getUser(usersId);
     }
 
     @PostMapping()
     public User create(@Valid @RequestBody User user) throws ValidationException {
-        if (user.getName() == null || user.getName().isBlank()) {
-            user.setName(user.getLogin());
-        }
-        user.setId(generateUserId());
-        users.put(user.getId(), user);
-        log.info("Пользователь создан");
-        return user;
+        return userService.create(user);
     }
 
     @PutMapping()
     public User update(@Valid @RequestBody User user) throws ValidationException {
-        if (user.getName() == null || user.getName().isBlank()) {
-            user.setName(user.getLogin());
-        }
-        if (!users.containsKey(user.getId())) {
-            log.info("Не можем обновить пользователя с id = {}, тк его нет в мапе", user.getId());
-            throw new NoSuchElementException();
-        }
+        return userService.update(user);
+    }
 
-        users.put(user.getId(), user);
-        log.info("Пользователь обновлен");
-        return user;
+    @PutMapping("/{id}/friends/{friendsId}")
+    public void addFriend(@PathVariable int id, @PathVariable int friendsId) {
+        userService.addFriend(id, friendsId);
+    }
+
+    @DeleteMapping("/{id}/friends/{friendsId}")
+    public void deleteFriends(@PathVariable int id, @PathVariable int friendsId) {
+        userService.removeFriend(id, friendsId);
+    }
+
+    @GetMapping("/{id}/friends")
+    public List<User> getFriends(@PathVariable int id) {
+        return userService.getUserFriends(id);
+    }
+
+    @GetMapping("/{id}/friends/common/{otherId}")
+    public List<User> getCommonFriends(@PathVariable int id, @PathVariable int otherId) {
+        return userService.getCommonFriends(id, otherId);
     }
 }
