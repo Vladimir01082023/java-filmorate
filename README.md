@@ -1,7 +1,8 @@
 ER-diagram
 
-https://app.quickdatabasediagrams.com/#/d/MNIu4K
+(https://app.quickdatabasediagrams.com/#/d/MNIu4K)
 
+```
 Описание Film
 «Жанр» (англ. Genre). У фильма может быть сразу несколько жанров, а у поля — несколько значений. Например, таких:
 
@@ -39,3 +40,4 @@ uf.friend_id
 FROM user AS u
 INNER JOIN user_friend AS uf u.user_id = uf.user_id
 GROUP BY u.user_id;
+```
