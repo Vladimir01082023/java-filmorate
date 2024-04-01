@@ -15,9 +15,9 @@ import java.util.Set;
 public class Film {
     private final Set<Integer> likes;
     private Integer id;
-    @NotBlank
+    @NotBlank(message = "Название фильмы не может быть пустым.")
     private final String name;
-    @Size(max = 200)
+    @Size(max = 200, message = "Максимальная длина текста - 200 символов.")
     private final String description;
     @NonNull
     private LocalDate releaseDate;
