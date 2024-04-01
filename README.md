@@ -1,7 +1,7 @@
    ER-diagram
 
 
-(![alt text](QuickDBD-FilmorateDB-1.png))
+(![alt text](QuickDBD-FilmorateDB.png))
 
 
 Описание Film
