@@ -47,3 +47,4 @@ FROM user AS u
 INNER JOIN user_friend AS uf u.user_id = uf.user_id
 GROUP BY u.user_id;
 ```
+
