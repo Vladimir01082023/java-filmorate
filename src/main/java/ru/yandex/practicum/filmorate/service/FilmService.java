@@ -21,10 +21,10 @@ import java.util.stream.Collectors;
 public class FilmService {
     @Autowired
     @Qualifier("inMemoryFilmStorage")
-private final FilmStorage inMemoryFilmStorage;
+    private final FilmStorage inMemoryFilmStorage;
     @Autowired
     @Qualifier("inMemoryUserStorage")
-private final UserStorage inMemoryUserStorage;
+    private final UserStorage inMemoryUserStorage;
 
     @Autowired
     public FilmService(InMemoryFilmStorage inMemoryFilmStorage, InMemoryUserStorage inMemoryUserStorage) {

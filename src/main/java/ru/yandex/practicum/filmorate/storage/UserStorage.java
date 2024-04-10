@@ -9,7 +9,9 @@ import java.util.Map;
 @Repository
 public interface UserStorage {
     User getUserById(int userId);
+
     Map<Integer, User> getUserInMap();
+
     List<User> getUsers();
 
     User create(User user);
