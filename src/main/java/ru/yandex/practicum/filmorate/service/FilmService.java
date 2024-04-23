@@ -21,8 +21,8 @@ public class FilmService {
         return filmStorage.findAll();
     }
 
-    public Film getFilmById(int id) {
-        return filmStorage.getFilmById(id);
+    public Film getFilmById(int filmid) {
+        return filmStorage.getFilmById(filmid);
     }
 
     public Film create(Film film) {

@@ -23,12 +23,12 @@ public class RatingStorageDao implements RatingStorage {
 
 
     @Override
-    public Rating getRatingById(int ratingId) {
-        SqlRowSet sql = jdbcTemplate.queryForRowSet("select * from FILM_RATING where rating_id=?", ratingId);
+    public Rating getRatingById(int id) {
+        SqlRowSet sql = jdbcTemplate.queryForRowSet("select * from FILM_RATING where rating_id=?", id);
         if (sql.next()) {
             return new Rating(sql.getInt(1), sql.getString(2));
         }
-        throw new NoSuchElementException(String.format("Нет рейтинга с id %d", ratingId));
+        throw new NoSuchElementException(String.format("Нет рейтинга с id %d", id));
     }
 
     @Override
