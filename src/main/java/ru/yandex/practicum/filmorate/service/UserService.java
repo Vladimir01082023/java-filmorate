@@ -1,55 +1,107 @@
 package ru.yandex.practicum.filmorate.service;
 
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.model.User;
-import ru.yandex.practicum.filmorate.storage.UserStorage;
+import ru.yandex.practicum.filmorate.storage.InMemoryUserStorage;
 
+import javax.validation.ValidationException;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 
 @Service
 @Slf4j
-@RequiredArgsConstructor
 public class UserService {
-    private final UserStorage userStorage;
+    private final InMemoryUserStorage inMemoryUserStorage;
 
+    @Autowired
+    public UserService(InMemoryUserStorage inMemoryUserStorage) {
+        this.inMemoryUserStorage = inMemoryUserStorage;
+    }
 
     public User getUser(int userId) {
-        return userStorage.getUserById(userId);
+        return inMemoryUserStorage.getUserById(userId);
     }
 
     public List<User> getUsers() {
-        return userStorage.getUsers();
+        return inMemoryUserStorage.getUsers();
     }
 
     public User create(User user) {
-        return userStorage.create(user);
+        return inMemoryUserStorage.create(user);
     }
 
     public User update(User user) {
-        return userStorage.update(user);
+        return inMemoryUserStorage.update(user);
     }
 
-    public void deleteUserById(int id) {
-        userStorage.deleteUserById(id);
-    }
 
     public void addFriend(int userId, int friendId) {
-        userStorage.addFriend(userId, friendId);
+        if (userId == friendId) {
+            log.warn("Id пользователя и id друга не должны совпадать");
+            throw new ValidationException();
+        } else {
+            log.info(String.format("Получен запрос на добавление в друзья. Пользователь с id = %s хочет добавить " +
+                    "пользователя с id = %s", userId, friendId));
+
+            User user = inMemoryUserStorage.getUserById(userId);
+            User friend = inMemoryUserStorage.getUserById(friendId);
+            Set<Integer> userFriends = user.getFriends();
+            Set<Integer> friendsOfAFriend = friend.getFriends();
+
+            userFriends.add(friendId);
+            friendsOfAFriend.add(userId);
+
+            log.info(String.format("Пользователи %s и %s стали друзьями", user.getName(), friend.getName()));
+        }
     }
 
     public void removeFriend(int userId, int friendId) {
-        userStorage.removeFriend(userId, friendId);
+        User user = inMemoryUserStorage.getUserById(userId);
+        User friend = inMemoryUserStorage.getUserById(friendId);
+        Set<Integer> userFriends = user.getFriends();
+        Set<Integer> friendsOfAFriend = friend.getFriends();
+
+        userFriends.remove(friendId);
+        friendsOfAFriend.remove(userId);
+
+        log.info(String.format("Пользователи %s и %s больше не друзья друзьями", user.getName(), friend.getName()));
     }
 
     public List<User> getUserFriends(int userId) {
-        return userStorage.getUserFriends(userId);
+        User user = inMemoryUserStorage.getUserById(userId);
+        Set<Integer> friendsIds = user.getFriends();
+        Map<Integer, User> users = inMemoryUserStorage.getUserInMap();
+        List<User> userFriends = new ArrayList<>();
+
+        for (Integer friendsId : friendsIds) {
+            if (users.containsKey(friendsId)) {
+                userFriends.add(users.get(friendsId));
+            }
+        }
+        return userFriends;
     }
 
-    public List<User> getCommonFriends(int userId, int userId2) {
-        return userStorage.getCommonFriends(userId, userId2);
+    public List<User> getCommonFriends(int userId, int otherId) {
+
+        User user = inMemoryUserStorage.getUserById(userId);
+        User otherUser = inMemoryUserStorage.getUserById(otherId);
+
+        Set<Integer> userFriends = user.getFriends();
+        Set<Integer> otherUserFriends = otherUser.getFriends();
+
+        List<User> commonFriends = new ArrayList<>();
+
+        for (Integer id : userFriends) {
+            if (otherUserFriends.contains(id)) {
+                commonFriends.add(inMemoryUserStorage.getUserById(id));
+            }
+        }
+        return commonFriends;
     }
+
 }
-
