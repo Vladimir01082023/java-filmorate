@@ -179,8 +179,8 @@ public class FilmStorageDAO implements FilmStorage {
     }
 
 
-    private void checkDateValidation(LocalDate date) {
-        if (date.isBefore(LocalDate.of(1895, 12, 28))) {
+    private void checkDateValidation(LocalDate localDate) {
+        if (localDate.isBefore(LocalDate.of(1895, 12, 28))) {
             log.warn("При создании фильма поле дата-релиза объекта Film не прошло валидацию");
 
             throw new DateValidationException("Дата фильма должна быть не менше 1895-12-28");
