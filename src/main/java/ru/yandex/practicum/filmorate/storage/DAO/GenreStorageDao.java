@@ -1,4 +1,4 @@
-package ru.yandex.practicum.filmorate.DAO;
+package ru.yandex.practicum.filmorate.storage.DAO;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -6,6 +6,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Component;
+import ru.yandex.practicum.filmorate.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.storage.GenreStorage;
@@ -89,6 +90,11 @@ public class GenreStorageDao implements GenreStorage {
 
         List<Integer> currentFilmGenres = getFilmsGenres(film.getId()).stream().map(Genre::getId).collect(Collectors.toList());
         Set<Integer> uniqueUpdatedFilmGenres = film.getGenres().stream().map(Genre::getId).collect(Collectors.toSet());
+        for (Integer uniqueUpdatedFilmGenre : uniqueUpdatedFilmGenres) {
+            if (uniqueUpdatedFilmGenre == 0) {
+                throw new ValidationException("Id жанра не может быть 0");
+            }
+        }
 
         List<Integer> removedFilmGenres = new ArrayList<>(currentFilmGenres);
         List<Integer> addedFilmGenres = new ArrayList<>(uniqueUpdatedFilmGenres);

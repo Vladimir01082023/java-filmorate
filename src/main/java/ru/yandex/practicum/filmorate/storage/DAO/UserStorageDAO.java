@@ -1,4 +1,4 @@
-package ru.yandex.practicum.filmorate.DAO;
+package ru.yandex.practicum.filmorate.storage.DAO;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -101,7 +101,11 @@ public class UserStorageDAO implements UserStorage {
     }
 
     public void addFriend(int userId, int friendId) {
-
+        if (userId == friendId) {
+            throw new ValidationException("Id пользователей не должны совпадать");
+        }
+        getUserById(userId);
+        getUserById(friendId);
         try {
             log.info(String.format("Получен запрос на добавление в друзья. Пользователь с id = %s хочет добавить " +
                     "пользователя с id = %s", userId, friendId));
@@ -111,10 +115,11 @@ public class UserStorageDAO implements UserStorage {
                     getStatusId("В друзьях"));
             jdbcTemplate.update("INSERT INTO USER_FRIEND VALUES (?, ?, ?)", friendId, userId,
                     getStatusId("Не в друзьях"));
-            log.info(String.format("Пользователи %s и %s стали друзьями", user.getName(), friend.getName()));
+            log.info(String.format("%s попал в список друзей пользователя %s", user.getName(), friend.getName()));
+            log.info(String.format("%s попал в список подписчиков пользователя %s", friend.getName(), user.getName()));
 
         } catch (Exception e) {
-            throw new NoSuchElementException();
+            throw new ValidationException("Ошибка добавления в друзья.");
         }
     }
 

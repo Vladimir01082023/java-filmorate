@@ -34,7 +34,7 @@ create table IF NOT EXISTS FILM
     constraint FILM_ID
         primary key (FILM_ID),
     constraint RATING_ID_FK
-        foreign key (FILM_RATING_ID) references FILM_RATING on delete cascade
+        foreign key (FILM_RATING_ID) references FILM_RATING
 );
 
 
@@ -60,8 +60,8 @@ create table IF NOT EXISTS FILM_GENRE
 create table IF NOT EXISTS USERS
 (
     USER_ID       INTEGER auto_increment,
-    USER_EMAIL    CHARACTER VARYING(100) not null,
-    USER_LOGIN    CHARACTER VARYING(255) not null,
+    USER_EMAIL    CHARACTER VARYING(100) not null UNIQUE CHECK (USER_EMAIL <> ''),
+    USER_LOGIN    CHARACTER VARYING(255) not null UNIQUE CHECK (USER_LOGIN <> ''),
     USER_NAME     CHARACTER VARYING(100),
     USER_BIRTHDAY DATE                   not null,
     constraint USER_ID
@@ -88,5 +88,6 @@ create table IF NOT EXISTS USER_FRIEND
     constraint USER_FRIEND__ID_FK
         foreign key (FRIEND_ID) references USERS on delete cascade,
     constraint USER_ID_FK
-        foreign key (USER_ID) references USERS on delete cascade
+        foreign key (USER_ID) references USERS on delete cascade,
+            PRIMARY KEY (user_id, friend_id)
 );

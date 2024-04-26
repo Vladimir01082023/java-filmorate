@@ -1,4 +1,4 @@
-package ru.yandex.practicum.filmorate.DAO;
+package ru.yandex.practicum.filmorate.storage.DAO;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -8,6 +8,7 @@ import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exceptions.DateValidationException;
+import ru.yandex.practicum.filmorate.exceptions.FilmExistingException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
@@ -46,6 +47,7 @@ public class FilmStorageDAO implements FilmStorage {
         log.info("Получен запрос на создание нового фильма");
         checkDateValidation(film.getReleaseDate());
 
+
         SimpleJdbcInsert jdbcInsert = new SimpleJdbcInsert(jdbcTemplate)
                 .withTableName("film")
                 .usingGeneratedKeyColumns("film_id");
@@ -62,10 +64,12 @@ public class FilmStorageDAO implements FilmStorage {
 
         film.setId(generatedId.intValue());
         genreStorageDao.updateFilmGenres(film);
-
-        log.info(String.format("Фильм создан: %s", film.getName()));
-        return film;
-
+        if (checkPresenceFilmInDataBase(film)) {
+            throw new FilmExistingException(String.format("Фильм %s уже существует в базе даннах!", film.getName()));
+        } else {
+            log.info(String.format("Фильм создан: %s", film.getName()));
+            return film;
+        }
     }
 
 
@@ -169,6 +173,8 @@ public class FilmStorageDAO implements FilmStorage {
 
     @Override
     public void putLike(int filmId, int userId) {
+        getFilmById(filmId);
+        userStorageDAO.getUserById(userId);
         jdbcTemplate.update("INSERT INTO FILM_LIKE VALUES ( ?, ? )", filmId, userId);
         log.info(String.format("%s поставил лайк фильму : %s", userStorageDAO.getUserById(userId), getFilmById(filmId)));
     }
@@ -184,6 +190,25 @@ public class FilmStorageDAO implements FilmStorage {
             log.warn("При создании фильма поле дата-релиза объекта Film не прошло валидацию");
 
             throw new DateValidationException("Дата фильма должна быть не менше 1895-12-28");
+        }
+    }
+
+    public boolean checkPresenceFilmInDataBase(Film film) {
+        List<Film> films = findAll();
+        int count = 0;
+        for (Film film1 : films) {
+            if (film1.getName().equals(film.getName()) && film1.getDescription().equals(film.getDescription()) &&
+                    film1.getReleaseDate().isEqual(film.getReleaseDate()) && film1.getDuration().equals(film.getDuration())
+                    && film1.getMpa().equals(film.getMpa()) && film1.getGenres().equals(film.getGenres())) {
+                count += 1;
+            }
+        }
+        if (count > 1) {
+            jdbcTemplate.update("DELETE FROM FILM_LIKE WHERE  FILM_ID = ?", film.getId());
+            log.warn(String.format("Фильм %s уже существует", film.getName()));
+            return true;
+        } else {
+            return false;
         }
     }
 

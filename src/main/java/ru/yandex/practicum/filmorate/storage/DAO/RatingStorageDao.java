@@ -1,4 +1,4 @@
-package ru.yandex.practicum.filmorate.DAO;
+package ru.yandex.practicum.filmorate.storage.DAO;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -42,7 +42,7 @@ public class RatingStorageDao implements RatingStorage {
         });
     }
 
-    public Rating getRating(ResultSet rs, int rowNum) throws SQLException {
+    private Rating getRating(ResultSet rs, int rowNum) throws SQLException {
         return new Rating(rs.getInt(1), rs.getString(2));
     }
 }
