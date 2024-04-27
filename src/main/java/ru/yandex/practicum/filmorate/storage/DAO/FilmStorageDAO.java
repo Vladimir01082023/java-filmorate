@@ -197,8 +197,7 @@ public class FilmStorageDAO implements FilmStorage {
                     film1.getDescription().toLowerCase().equals(film.getDescription().toLowerCase()) &&
                     film1.getReleaseDate().isEqual(film.getReleaseDate()) && film1.getDuration().equals(film.getDuration()) &&
                     film1.getMpa().equals(film.getMpa()) &&
-                    film1.getGenres().stream().map(genre -> genre.getId()).collect(Collectors.toList()).equals
-                            (film.getGenres().stream().map(genre -> genre.getId()).collect(Collectors.toList()))) {
+                    film1.getGenres().stream().map(genre -> genre.getId()).collect(Collectors.toList()).equals(film.getGenres().stream().map(genre -> genre.getId()).collect(Collectors.toList()))) {
                 throw new UserExistingException("Ошибка при добавлении фильмы: фильм уже существует!");
             }
         }
