@@ -8,7 +8,7 @@ import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exceptions.DateValidationException;
-import ru.yandex.practicum.filmorate.exceptions.FilmExistingException;
+import ru.yandex.practicum.filmorate.exceptions.UserExistingException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
@@ -18,6 +18,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Component
 @Slf4j
@@ -32,7 +33,7 @@ public class FilmStorageDAO implements FilmStorage {
 
 
     @Override
-    public List<Film> findAll() {
+    public List<Film> getAllFilms() {
         return jdbcTemplate.query("SELECT * FROM film", new RowMapper<Film>() {
 
             public Film mapRow(ResultSet rs, int rowNum) throws SQLException {
@@ -46,12 +47,10 @@ public class FilmStorageDAO implements FilmStorage {
     public Film create(Film film) {
         log.info("Получен запрос на создание нового фильма");
         checkDateValidation(film.getReleaseDate());
-
-
+        checkPresenceFilmInDataBase(film);
         SimpleJdbcInsert jdbcInsert = new SimpleJdbcInsert(jdbcTemplate)
                 .withTableName("film")
                 .usingGeneratedKeyColumns("film_id");
-
 
         Map<String, Object> parameters = new HashMap<>();
         parameters.put("film_name", film.getName());
@@ -64,12 +63,10 @@ public class FilmStorageDAO implements FilmStorage {
 
         film.setId(generatedId.intValue());
         genreStorageDao.updateFilmGenres(film);
-        if (checkPresenceFilmInDataBase(film)) {
-            throw new FilmExistingException(String.format("Фильм %s уже существует в базе даннах!", film.getName()));
-        } else {
-            log.info(String.format("Фильм создан: %s", film.getName()));
-            return film;
-        }
+
+        log.info(String.format("Фильм создан: %s", film.getName()));
+        return film;
+
     }
 
 
@@ -87,7 +84,7 @@ public class FilmStorageDAO implements FilmStorage {
 
     @Override
     public Film update(Film film) {
-        for (Film film1 : findAll()) {
+        for (Film film1 : getAllFilms()) {
             if (film.getId() == film1.getId()) {
                 jdbcTemplate.update("UPDATE FILM SET FILM_NAME = ?, FILM_DESCRIPTION = ?, FILM_RELEASE_DATE = ?, " +
                                 "FILM_DURATION = ?, FILM_RATING_ID = ? where FILM_ID = ?", film.getName(), film.getDescription(),
@@ -104,7 +101,7 @@ public class FilmStorageDAO implements FilmStorage {
     public Film getFilmById(int filmId) {
         SqlRowSet rowSet = jdbcTemplate.queryForRowSet("SELECT * FROM FILM WHERE FILM_ID = ?", filmId);
         List<Integer> filmIds = new ArrayList<>();
-        for (Film film1 : findAll()) {
+        for (Film film1 : getAllFilms()) {
             filmIds.add(film1.getId());
         }
         if (filmIds.contains(filmId)) {
@@ -193,23 +190,17 @@ public class FilmStorageDAO implements FilmStorage {
         }
     }
 
-    public boolean checkPresenceFilmInDataBase(Film film) {
-        List<Film> films = findAll();
-        int count = 0;
+    public void checkPresenceFilmInDataBase(Film film) {
+        List<Film> films = getAllFilms();
         for (Film film1 : films) {
-            if (film1.getName().equals(film.getName()) && film1.getDescription().equals(film.getDescription()) &&
-                    film1.getReleaseDate().isEqual(film.getReleaseDate()) && film1.getDuration().equals(film.getDuration())
-                    && film1.getMpa().equals(film.getMpa()) && film1.getGenres().equals(film.getGenres())) {
-                count += 1;
+            if (film1.getName().toLowerCase().equals(film.getName().toLowerCase()) &&
+                    film1.getDescription().toLowerCase().equals(film.getDescription().toLowerCase()) &&
+                    film1.getReleaseDate().isEqual(film.getReleaseDate()) && film1.getDuration().equals(film.getDuration()) &&
+                    film1.getMpa().equals(film.getMpa()) &&
+                    film1.getGenres().stream().map(genre -> genre.getId()).collect(Collectors.toList()).
+                            equals(film.getGenres().stream().map(genre -> genre.getId()).collect(Collectors.toList()))) {
+                throw new UserExistingException("Ошибка при добавлении фильмы: фильм уже существует!");
             }
         }
-        if (count > 1) {
-            jdbcTemplate.update("DELETE FROM FILM_LIKE WHERE  FILM_ID = ?", film.getId());
-            log.warn(String.format("Фильм %s уже существует", film.getName()));
-            return true;
-        } else {
-            return false;
-        }
     }
-
 }

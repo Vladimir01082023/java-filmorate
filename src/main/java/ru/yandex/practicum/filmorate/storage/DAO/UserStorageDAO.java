@@ -2,12 +2,15 @@ package ru.yandex.practicum.filmorate.storage.DAO;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Component;
+import ru.yandex.practicum.filmorate.exceptions.UserExistingException;
 import ru.yandex.practicum.filmorate.exceptions.ValidationException;
+import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 
@@ -60,6 +63,7 @@ public class UserStorageDAO implements UserStorage {
     @Override
     public User create(User user) {
         log.info("Получен запрос на создание нового пользователя");
+        checkPresenceUserInDataBase(user);
 
         SimpleJdbcInsert jdbcInsert = new SimpleJdbcInsert(jdbcTemplate)
                 .withTableName("users")
@@ -100,6 +104,7 @@ public class UserStorageDAO implements UserStorage {
 
     }
 
+    @Override
     public void addFriend(int userId, int friendId) {
         if (userId == friendId) {
             throw new ValidationException("Id пользователей не должны совпадать");
@@ -123,6 +128,7 @@ public class UserStorageDAO implements UserStorage {
         }
     }
 
+    @Override
     public void removeFriend(int userId, int friendId) {
         if (userId == friendId) {
             throw new ValidationException("Id пользователя и id друга не должны совпадать");
@@ -136,6 +142,7 @@ public class UserStorageDAO implements UserStorage {
         }
     }
 
+    @Override
     public List<User> getUserFriends(Integer id) {
         if (getUserById(id) == null) {
             throw new NoSuchElementException("Пользователя с таким id нет");
@@ -149,6 +156,7 @@ public class UserStorageDAO implements UserStorage {
         return friends;
     }
 
+    @Override
     public List<User> getCommonFriends(int userId1, int userId2) {
         List<User> commonFriends = new ArrayList<>();
         for (User userFriend : getUserFriends(userId1)) {
@@ -173,6 +181,16 @@ public class UserStorageDAO implements UserStorage {
             return status.getInt(1);
         } else {
             throw new NoSuchElementException(String.format("%s нет в базе данных", statusName));
+        }
+    }
+
+    public void checkPresenceUserInDataBase(User user) {
+        List<User> users = getUsers();
+        for (User user1 : users) {
+            if (user1.getLogin().equals(user.getLogin()) || user1.getEmail().equals(user.getEmail())) {
+                log.warn(String.format("Пользователь уже существует"));
+                throw new UserExistingException("Ошибка при добавлении: пользователь уже существует!");
+            }
         }
     }
 }

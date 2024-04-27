@@ -17,8 +17,8 @@ public class FilmService {
 
     private final FilmStorage filmStorage;
 
-    public List<Film> findAll() {
-        return filmStorage.findAll();
+    public List<Film> getAllFilms() {
+        return filmStorage.getAllFilms();
     }
 
     public Film getFilmById(int filmid) {

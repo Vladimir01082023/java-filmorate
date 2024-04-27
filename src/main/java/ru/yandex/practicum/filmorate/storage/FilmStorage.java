@@ -8,7 +8,7 @@ import java.util.List;
 
 @Repository
 public interface FilmStorage {
-    List<Film> findAll();
+    List<Film> getAllFilms();
 
     Film create(Film film);
 

@@ -38,8 +38,8 @@ public class FilmAndUserStorageDaoTest {
         Film filmFromBd = filmService.getFilmById(film.getId());
 
         assertNotNull(filmFromBd);
-        assertEquals(1, filmService.findAll().size());
-        assertTrue(filmService.findAll().contains(filmFromBd));
+        assertEquals(1, filmService.getAllFilms().size());
+        assertTrue(filmService.getAllFilms().contains(filmFromBd));
     }
 
     @Test
@@ -52,8 +52,8 @@ public class FilmAndUserStorageDaoTest {
         Film filmFromBd = filmService.getFilmById(film.getId());
 
         assertNotNull(filmFromBd);
-        assertEquals(2, filmService.findAll().size());
-        assertTrue(filmService.findAll().contains(filmFromBd));
+        assertEquals(2, filmService.getAllFilms().size());
+        assertTrue(filmService.getAllFilms().contains(filmFromBd));
         assertEquals(film, filmFromBd);
 
         film.setName("UpdatedName");
@@ -61,7 +61,7 @@ public class FilmAndUserStorageDaoTest {
 
         filmService.update(film);
 
-        assertEquals(2, filmService.findAll().size());
+        assertEquals(2, filmService.getAllFilms().size());
         assertEquals(filmService.getFilmById(film.getId()), film);
 
     }
@@ -75,13 +75,13 @@ public class FilmAndUserStorageDaoTest {
 
         assertNotNull(filmFromBd);
 
-        assertEquals(1, filmService.findAll().size());
-        assertTrue(filmService.findAll().contains(filmFromBd));
+        assertEquals(1, filmService.getAllFilms().size());
+        assertTrue(filmService.getAllFilms().contains(filmFromBd));
         assertEquals(film, filmFromBd);
 
         filmService.removeFilm(film.getId());
-        assertEquals(0, filmService.findAll().size());
-        assertFalse(filmService.findAll().contains(filmFromBd));
+        assertEquals(0, filmService.getAllFilms().size());
+        assertFalse(filmService.getAllFilms().contains(filmFromBd));
     }
 
     @Test
