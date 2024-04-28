@@ -22,8 +22,8 @@ public class FilmController {
     }
 
     @GetMapping()
-    public List<Film> findAll() {
-        return filmService.findAll();
+    public List<Film> getAllFilms() {
+        return filmService.getAllFilms();
     }
 
     @PostMapping()
@@ -36,7 +36,7 @@ public class FilmController {
         return filmService.update(film);
     }
 
-    @GetMapping("/id")
+    @GetMapping("/{id}")
     public Film getFilmById(@PathVariable int id) {
         return filmService.getFilmById(id);
     }
@@ -56,6 +56,5 @@ public class FilmController {
         return filmService.getPopularFilms(count);
 
     }
-
 
 }
