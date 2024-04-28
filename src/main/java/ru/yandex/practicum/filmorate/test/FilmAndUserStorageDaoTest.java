@@ -44,15 +44,14 @@ public class FilmAndUserStorageDaoTest {
 
     @Test
     public void shouldUpdateFilm() {
-     Film film = filmService.create(new Film(1, "Film", "FilmDescription",
+        Film film = filmService.create(new Film(1, "Film", "FilmDescription",
                 LocalDate.of(2000, 1, 1), 100, rating, genres));
 
-        filmService.create(film);
 
         Film filmFromBd = filmService.getFilmById(film.getId());
 
         assertNotNull(filmFromBd);
-        assertEquals(2, filmService.getAllFilms().size());
+        assertEquals(1, filmService.getAllFilms().size());
         assertTrue(filmService.getAllFilms().contains(filmFromBd));
         assertEquals(film, filmFromBd);
 
@@ -61,14 +60,14 @@ public class FilmAndUserStorageDaoTest {
 
         filmService.update(film);
 
-        assertEquals(2, filmService.getAllFilms().size());
+        assertEquals(1, filmService.getAllFilms().size());
         assertEquals(filmService.getFilmById(film.getId()), film);
 
     }
 
     @Test
     public void shouldDeleteFilmById() {
-     Film film = filmService.create(new Film(1, "Film", "FilmDescription",
+        Film film = filmService.create(new Film(1, "Film", "FilmDescription",
                 LocalDate.of(2000, 1, 1), 100, rating, genres));
 
         Film filmFromBd = filmService.getFilmById(film.getId());
@@ -129,10 +128,6 @@ public class FilmAndUserStorageDaoTest {
         User user3 = userService.create(new User(3, "vladimir-malyshev-2016@mail.ru", "Vladimir03",
                 "Volodya", LocalDate.of(1997, 9, 11)));
 
-        userService.create(user1);
-        userService.create(user2);
-        userService.create(user3);
-
         Film film1 = filmService.create(new Film(1, "Film1", "FilmDescription1",
                 LocalDate.of(2000, 1, 1), 100, rating, genres));
 
@@ -141,10 +136,7 @@ public class FilmAndUserStorageDaoTest {
 
         Film film3 = filmService.create(new Film(3, "Film3", "FilmDescription3",
                 LocalDate.of(2000, 1, 1), 100, rating, genres));
-
-        filmService.create(film1);
-        filmService.create(film2);
-        filmService.create(film3);
+        
 
         filmService.putLike(film1.getId(), user1.getId());
         filmService.putLike(film1.getId(), user2.getId());
@@ -170,7 +162,7 @@ public class FilmAndUserStorageDaoTest {
         User savedUser = userService.getUser(1);
 
         assertNotNull(savedUser);
-        assertEquals(1,userService.getUsers().size());
+        assertEquals(1, userService.getUsers().size());
         assertTrue(userService.getUsers().contains(savedUser));
     }
 
@@ -182,7 +174,7 @@ public class FilmAndUserStorageDaoTest {
         User savedUser = userService.getUser(1);
 
         assertNotNull(savedUser);
-        assertEquals(1,userService.getUsers().size());
+        assertEquals(1, userService.getUsers().size());
         assertTrue(userService.getUsers().contains(savedUser));
 
         user.setName("UpdateName");
@@ -190,7 +182,7 @@ public class FilmAndUserStorageDaoTest {
 
         userService.update(user);
 
-        assertEquals(1,userService.getUsers().size());
+        assertEquals(1, userService.getUsers().size());
         assertTrue(userService.getUsers().contains(user));
         assertFalse(userService.getUsers().contains(savedUser));
     }
@@ -203,12 +195,12 @@ public class FilmAndUserStorageDaoTest {
         User savedUser = userService.getUser(user.getId());
 
         assertNotNull(savedUser);
-        assertEquals(1,userService.getUsers().size());
+        assertEquals(1, userService.getUsers().size());
         assertTrue(userService.getUsers().contains(savedUser));
 
         userService.deleteUserById(savedUser.getId());
 
-        assertEquals(0,userService.getUsers().size());
+        assertEquals(0, userService.getUsers().size());
         assertFalse(userService.getUsers().contains(savedUser));
     }
 
